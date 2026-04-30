@@ -23,7 +23,9 @@ services:
       - ./infra/mongodb-init:/docker-entrypoint-initdb.d
 
   orchestrator-service:
-    build: ./services/orchestrator_service
+    build:
+      context: .
+      dockerfile: services/orchestrator_service/Dockerfile
     environment:
       - SERVICE_NAME=orchestrator-service
       - MONGO_URI=mongodb://mongodb:27017
@@ -36,35 +38,45 @@ services:
     depends_on: [mongodb]
 
   extract-agent-service:
-    build: ./services/extract_agent_service
+    build:
+      context: .
+      dockerfile: services/extract_agent_service/Dockerfile
     environment:
       - SERVICE_NAME=extract-agent-service
       - MONGO_URI=mongodb://mongodb:27017
       - DATABASE_NAME=p2p
 
   validation-agent-service:
-    build: ./services/validation_agent_service
+    build:
+      context: .
+      dockerfile: services/validation_agent_service/Dockerfile
     environment:
       - SERVICE_NAME=validation-agent-service
       - MONGO_URI=mongodb://mongodb:27017
       - DATABASE_NAME=p2p
 
   approval-payment-service:
-    build: ./services/approval_payment_service
+    build:
+      context: .
+      dockerfile: services/approval_payment_service/Dockerfile
     environment:
       - SERVICE_NAME=approval-payment-service
       - MONGO_URI=mongodb://mongodb:27017
       - DATABASE_NAME=p2p
 
   sla-agent-service:
-    build: ./services/sla_agent_service
+    build:
+      context: .
+      dockerfile: services/sla_agent_service/Dockerfile
     environment:
       - SERVICE_NAME=sla-agent-service
       - MONGO_URI=mongodb://mongodb:27017
       - DATABASE_NAME=p2p
 
   query-writer-service:
-    build: ./services/query_writer_service
+    build:
+      context: .
+      dockerfile: services/query_writer_service/Dockerfile
     environment:
       - SERVICE_NAME=query-writer-service
       - MONGO_URI=mongodb://mongodb:27017
