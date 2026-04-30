@@ -1,0 +1,74 @@
+version: "3.9"
+services:
+  api-gateway:
+    image: nginx:1.27-alpine
+    volumes:
+      - ./infra/docker/nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "8080:8080"
+    depends_on:
+      - orchestrator-service
+      - extract-agent-service
+      - validation-agent-service
+      - approval-payment-service
+      - sla-agent-service
+      - query-writer-service
+
+  mongodb:
+    image: mongo:7
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+      - ./infra/mongodb-init:/docker-entrypoint-initdb.d
+
+  orchestrator-service:
+    build: ./services/orchestrator_service
+    environment:
+      - SERVICE_NAME=orchestrator-service
+      - MONGO_URI=mongodb://mongodb:27017
+      - DATABASE_NAME=p2p
+      - EXTRACT_URL=http://extract-agent-service:8000
+      - VALIDATION_URL=http://validation-agent-service:8000
+      - APPROVAL_URL=http://approval-payment-service:8000
+      - SLA_URL=http://sla-agent-service:8000
+      - QUERY_WRITER_URL=http://query-writer-service:8000
+    depends_on: [mongodb]
+
+  extract-agent-service:
+    build: ./services/extract_agent_service
+    environment:
+      - SERVICE_NAME=extract-agent-service
+      - MONGO_URI=mongodb://mongodb:27017
+      - DATABASE_NAME=p2p
+
+  validation-agent-service:
+    build: ./services/validation_agent_service
+    environment:
+      - SERVICE_NAME=validation-agent-service
+      - MONGO_URI=mongodb://mongodb:27017
+      - DATABASE_NAME=p2p
+
+  approval-payment-service:
+    build: ./services/approval_payment_service
+    environment:
+      - SERVICE_NAME=approval-payment-service
+      - MONGO_URI=mongodb://mongodb:27017
+      - DATABASE_NAME=p2p
+
+  sla-agent-service:
+    build: ./services/sla_agent_service
+    environment:
+      - SERVICE_NAME=sla-agent-service
+      - MONGO_URI=mongodb://mongodb:27017
+      - DATABASE_NAME=p2p
+
+  query-writer-service:
+    build: ./services/query_writer_service
+    environment:
+      - SERVICE_NAME=query-writer-service
+      - MONGO_URI=mongodb://mongodb:27017
+      - DATABASE_NAME=p2p
+
+volumes:
+  mongo_data:
