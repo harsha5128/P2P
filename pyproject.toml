@@ -30,6 +30,10 @@ dev = [
   "mypy>=1.11"
 ]
 
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["infra*", "common*", "services*"]
+
 [tool.ruff]
 line-length = 100
 
